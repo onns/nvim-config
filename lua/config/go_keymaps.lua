@@ -54,7 +54,7 @@ vim.api.nvim_create_user_command(
 
 function TodoTelescopeWithCWD()
     local pwd = vim.fn.getcwd()
-    local goplsRootDir = GetGoplsRootDir()
+    local goplsRootDir = GetLSPRootDir()
     if goplsRootDir then
         pwd = goplsRootDir
     end

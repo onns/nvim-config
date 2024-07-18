@@ -25,9 +25,9 @@ function SaveHttpResp()
   end
 end
 
-vim.api.nvim_set_keymap("n", "<leader>rr", "<cmd>Rest run<cr>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>rr", "<cmd>Rest run<cr>", { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("n", "<leader>rs", ":lua SaveHttpResp()<CR>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>rs", ":lua SaveHttpResp()<CR>", { noremap = true, silent = true })
 
 function GetLSPRootDir()
   local clients = vim.lsp.get_active_clients()
@@ -416,3 +416,7 @@ end
 
 vim.api.nvim_set_keymap("n", "]oc", "<cmd>lua JumpToNextFuncCall()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "[oc", "<cmd>lua JumpToLastFuncCall()<CR>", { noremap = true, silent = true })
+
+
+-- vim.api.nvim_set_keymap("n", "<leader>fe", "<cmd>Rest run<cr>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>fz", ":Neotree reveal reveal_force_cwd<CR>", { noremap = true })
