@@ -54,4 +54,7 @@ return {
     {
         'tpope/vim-fugitive'
     },
+    {
+        'blacklight/nvim-http'
+    },
 }
