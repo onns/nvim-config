@@ -27,7 +27,9 @@ end
 
 -- vim.api.nvim_set_keymap("n", "<leader>rr", "<cmd>Rest run<cr>", { noremap = true, silent = true })
 
--- vim.api.nvim_set_keymap("n", "<leader>rs", ":lua SaveHttpResp()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '\\rp', '<Plug>RestNvimPreview', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '\\rr', '<Plug>RestNvim', { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "\\rs", ":lua SaveHttpResp()<CR>", { noremap = true, silent = true })
 
 function GetLSPRootDir()
   local clients = vim.lsp.get_active_clients()
