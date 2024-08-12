@@ -38,13 +38,17 @@ vim.api.nvim_set_keymap("i", "<C-g> <esc>", ":<C-u>GoDeclsDir<CR>", { silent = t
 vim.opt.wrap = true
 
 vim.g.startify_files_number = 20
-
+-- 打开文件不改变cwd
+vim.g.startify_change_to_dir = 0
 
 vim.opt.list = true
 vim.opt.listchars = {
-    tab = '▸\\ ', -- 设置Tab显示为一个小三角后跟一个空格
-    trail = '·', -- 设置行尾空格显示为中点
-    extends = '>', -- 当文本超出屏幕视图时在右边界显示
-    precedes = '<', -- 当文本超出屏幕视图时在左边界显示
-    nbsp = '␣' -- 不断行空格的显示
+  tab = "▸\\ ", -- 设置Tab显示为一个小三角后跟一个空格
+  trail = "·", -- 设置行尾空格显示为中点
+  extends = ">", -- 当文本超出屏幕视图时在右边界显示
+  precedes = "<", -- 当文本超出屏幕视图时在左边界显示
+  nbsp = "␣", -- 不断行空格的显示
 }
+
+-- 设置剪贴板使用系统剪贴板
+vim.opt.clipboard = "unnamedplus"

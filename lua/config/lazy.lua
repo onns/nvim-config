@@ -5,7 +5,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out,                            "WarningMsg" },
+      { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
     vim.fn.getchar()
@@ -34,7 +34,7 @@ require("lazy").setup({
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
-  },                -- automatically check for plugin updates
+  }, -- automatically check for plugin updates
   performance = {
     rtp = {
       -- disable some rtp plugins
@@ -61,14 +61,15 @@ require("gitsigns").setup({
     ignore_whitespace = false,
     virt_text_priority = 100,
   },
+  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d %X> - <summary>",
 })
 
 require("lspconfig").gopls.setup({
   cmd = { "gopls", "-remote=unix;/tmp/gopls-daemon-socket" },
   settings = {
     gopls = {
-      gofumpt = true
-    }
+      gofumpt = true,
+    },
   },
 })
 
@@ -81,9 +82,6 @@ cmp.setup({
   preselect = cmp.PreselectMode.None,
 })
 
--- 设置剪贴板使用系统剪贴板
-vim.opt.clipboard:append("unnamedplus")
-
 require("aerial").setup({
   layout = {
     min_width = 40,
@@ -92,9 +90,9 @@ require("aerial").setup({
 })
 
 -- https://github.com/nvim-telescope/telescope.nvim/pull/1735
-require("telescope").setup {
+require("telescope").setup({
   defaults = {
     wrap_results = true,
     sorting_strategy = "ascending",
   },
-}
+})

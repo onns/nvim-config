@@ -2,7 +2,7 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
-require('config.go_keymaps')
+require("config.go_keymaps")
 
 function SaveHttpResp()
   -- 获取当前时间并格式化为时间戳
@@ -26,10 +26,6 @@ function SaveHttpResp()
 end
 
 -- vim.api.nvim_set_keymap("n", "<leader>rr", "<cmd>Rest run<cr>", { noremap = true, silent = true })
-
-vim.api.nvim_set_keymap('n', '\\rp', '<Plug>RestNvimPreview', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '\\rr', '<Plug>RestNvim', { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "\\rs", ":lua SaveHttpResp()<CR>", { noremap = true, silent = true })
 
 function GetLSPRootDir()
   local clients = vim.lsp.get_active_clients()
@@ -63,13 +59,6 @@ function GoToPathAndLine(input)
   vim.cmd("edit +" .. line .. " " .. pwd .. "/" .. file)
 end
 
-vim.api.nvim_set_keymap(
-  "n",
-  "gto",
-  ':lua GoToPathAndLine(vim.fn.input("Enter path and line: "))<CR>',
-  { noremap = true }
-)
-
 function ExportExpandToClipboard()
   local pwd = vim.fn.getcwd()
   local goplsRootDir = GetLSPRootDir()
@@ -82,8 +71,6 @@ function ExportExpandToClipboard()
   print("Expanded path copied to clipboard: " .. expanded)
 end
 
-vim.api.nvim_set_keymap("n", "gcr", ":lua ExportExpandToClipboard()<CR>", { noremap = true })
-
 local function check_spelling()
   -- 保存当前文件
   vim.cmd("write")
@@ -94,7 +81,7 @@ local function check_spelling()
 
   -- 构建CSpell命令
   local command = 'cspell --config /Users/onns/.onns/weiyun/code/config/vim/cspell.yaml -r "/Users/onns" '
-      .. current_file
+    .. current_file
 
   -- 在新的终端窗口中执行CSpell
   vim.cmd("split | terminal " .. command)
@@ -102,19 +89,6 @@ end
 
 -- 将Lua函数绑定到Neovim命令
 vim.api.nvim_create_user_command("SpellCheck", check_spelling, {})
-
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>pj",
-  [[:.s/\v(\w+) \= (\d+).*;/\1 = \2 [(gogoproto.jsontag) = '\1', json_name = '\1'];<CR>]],
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>pf",
-  [[:.s/\v(\w+) \= (\d+).*;/\1 = \2 [(gogoproto.moretags) = 'form:"\1"',(gogoproto.jsontag) = '\1', json_name = '\1'];<CR>]],
-  { noremap = true, silent = true }
-)
 
 function InsertGitBranch()
   local cwd = vim.fn.getcwd()
@@ -128,7 +102,7 @@ function InsertGitBranch()
     local line_num = vim.api.nvim_win_get_cursor(0)[1]
     local todo_info = "TODO: onns " .. git_branch .. " "
     vim.api.nvim_buf_set_lines(0, line_num - 1, line_num - 1, false, { todo_info })
-    require('mini.comment').toggle_lines(line_num, line_num)
+    require("mini.comment").toggle_lines(line_num, line_num)
     local buf = vim.api.nvim_get_current_buf() -- 获取当前缓冲区的句柄
     local lines = vim.api.nvim_buf_get_lines(buf, line_num - 1, line_num, false)
     if #lines > 0 then
@@ -138,8 +112,6 @@ function InsertGitBranch()
     end
   end
 end
-
-vim.api.nvim_set_keymap("n", "<leader>ig", ":lua InsertGitBranch()<CR>", { noremap = true })
 
 local ts_utils = require("nvim-treesitter.ts_utils")
 
@@ -172,8 +144,6 @@ function JumpToFunctionName()
   end
 end
 
-vim.api.nvim_set_keymap("n", "[n", "<cmd>lua JumpToFunctionName()<CR>", { noremap = true, silent = true })
-
 function GetGoImportPath()
   local current_file = vim.api.nvim_buf_get_name(0)
   local current_path = vim.fn.fnamemodify(current_file, ":h")
@@ -202,15 +172,6 @@ function GetGoImportPath()
   vim.fn.setreg("+", import_package_name)
   print("Import path copied to clipboard: " .. import_package_name)
 end
-
-vim.api.nvim_set_keymap("n", "gcp", ":lua GetGoImportPath()<CR>", { noremap = true })
-
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>fm",
-  ":lua require('bookmarks').toggle_bookmarks()<CR>",
-  { noremap = true, silent = true }
-)
 
 local function get_child_index(node)
   local parent = node:parent()
@@ -300,8 +261,6 @@ function JumpToCall(direction)
     vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
   end
 end
-
-vim.api.nvim_set_keymap("n", "]od", '<cmd>lua JumpToCall("down")<CR>', { noremap = true, silent = true })
 
 local function _set_cursor(node)
   -- TODO: check the validity of range
@@ -419,6 +378,43 @@ end
 vim.api.nvim_set_keymap("n", "]oc", "<cmd>lua JumpToNextFuncCall()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "[oc", "<cmd>lua JumpToLastFuncCall()<CR>", { noremap = true, silent = true })
 
-
 -- vim.api.nvim_set_keymap("n", "<leader>fe", "<cmd>Rest run<cr>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>fz", ":Neotree reveal reveal_force_cwd<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "\\fz", ":Neotree reveal reveal_force_cwd<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "]od", '<cmd>lua JumpToCall("down")<CR>', { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap("n", "\\rp", "<Plug>RestNvimPreview", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "\\rr", "<Plug>RestNvim", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "\\rs", ":lua SaveHttpResp()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap(
+  "n",
+  "\\gt",
+  ':lua GoToPathAndLine(vim.fn.input("Enter path and line: "))<CR>',
+  { noremap = true }
+)
+vim.api.nvim_set_keymap("n", "\\pr", ":lua ExportExpandToClipboard()<CR>", { noremap = true })
+
+vim.api.nvim_set_keymap(
+  "n",
+  "\\pj",
+  [[:.s/\v(\w+) \= (\d+).*;/\1 = \2 [(gogoproto.jsontag) = '\1', json_name = '\1'];<CR>]],
+  { noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap(
+  "n",
+  "\\pf",
+  [[:.s/\v(\w+) \= (\d+).*;/\1 = \2 [(gogoproto.moretags) = 'form:"\1"',(gogoproto.jsontag) = '\1', json_name = '\1'];<CR>]],
+  { noremap = true, silent = true }
+)
+
+vim.api.nvim_set_keymap("n", "\\pi", ":lua GetGoImportPath()<CR>", { noremap = true })
+
+vim.api.nvim_set_keymap(
+  "n",
+  "\\fm",
+  ":lua require('bookmarks').toggle_bookmarks()<CR>",
+  { noremap = true, silent = true }
+)
+
+vim.api.nvim_set_keymap("n", "\\ig", ":lua InsertGitBranch()<CR>", { noremap = true })
+
+vim.api.nvim_set_keymap("n", "[on", "<cmd>lua JumpToFunctionName()<CR>", { noremap = true, silent = true })
