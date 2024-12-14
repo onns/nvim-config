@@ -107,4 +107,5 @@ require("fzf-lua").setup({
       wrap = "wrap",
     },
   },
+  fzf_opts = { ["--wrap"] = true },
 })
