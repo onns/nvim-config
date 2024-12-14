@@ -77,10 +77,10 @@ require("lspconfig").gopls.setup({
 
 -- https://github.com/hrsh7th/nvim-cmp/issues/1809
 -- gopls 在返回提示词的时候随机选择，理论上应该默认选第一个
-local cmp = require("cmp")
-cmp.setup({
-  preselect = cmp.PreselectMode.None,
-})
+-- local cmp = require("cmp")
+-- cmp.setup({
+--   preselect = cmp.PreselectMode.None,
+-- })
 
 require("aerial").setup({
   layout = {
@@ -90,9 +90,21 @@ require("aerial").setup({
 })
 
 -- https://github.com/nvim-telescope/telescope.nvim/pull/1735
-require("telescope").setup({
-  defaults = {
-    wrap_results = true,
-    sorting_strategy = "ascending",
+-- require("telescope").setup({
+--   defaults = {
+--     wrap_results = true,
+--     sorting_strategy = "ascending",
+--   },
+-- })
+--
+-- require("lspconfig").buf_ls.setup({
+--   root_dir = require("lspconfig.util").root_pattern(".git", "buf.yaml"),
+-- })
+
+require("fzf-lua").setup({
+  winopts = {
+    preview = {
+      wrap = "wrap",
+    },
   },
 })

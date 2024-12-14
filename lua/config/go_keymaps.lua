@@ -43,14 +43,14 @@ vim.api.nvim_create_user_command(
   { nargs = 1 } -- 命令接受一个参数
 )
 
-function TodoTelescopeWithCWD()
+function TodoWithCWD()
   local pwd = vim.fn.getcwd()
   local goplsRootDir = GetLSPRootDir()
   if goplsRootDir then
     pwd = goplsRootDir
   end
-  print("TodoTelescope at : " .. pwd)
-  vim.cmd("TodoTelescope cwd=" .. pwd)
+  print("TodoFzfLua at : " .. pwd)
+  vim.cmd("TodoFzfLua cwd=" .. pwd)
 end
 
 -- 待定列表
@@ -88,20 +88,20 @@ local function find_upwards()
   return nil
 end
 
-function TodoTelescopeWithProject()
+function TodoWithProject()
   local pwd = vim.fn.getcwd()
   local projectDir = find_upwards()
   if projectDir then
     pwd = projectDir
   end
-  print("TodoTelescope at : " .. pwd)
-  vim.cmd("TodoTelescope cwd=" .. pwd)
+  print("TodoFzfLua at : " .. pwd)
+  vim.cmd("TodoFzfLua cwd=" .. pwd)
 end
 
-vim.api.nvim_set_keymap("n", "\\fp", ":lua TodoTelescopeWithProject()<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "\\fp", ":lua TodoWithProject()<CR>", { noremap = true })
 
 vim.api.nvim_create_user_command("LgExtension", function(opts)
   LiveGrepWithExtension(opts.args)
 end, { nargs = 1 })
 
-vim.api.nvim_set_keymap("n", "\\fc", ":lua TodoTelescopeWithCWD()<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "\\fc", ":lua TodoWithCWD()<CR>", { noremap = true })
