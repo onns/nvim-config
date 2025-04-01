@@ -52,3 +52,21 @@ vim.opt.listchars = {
 
 -- 设置剪贴板使用系统剪贴板
 vim.opt.clipboard = "unnamedplus"
+vim.g.snacks_animate = false
+
+if os.getenv("SSH_TTY") ~= nil then
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+end
+
+vim.g.floaterm_height = 0.2
+vim.g.floaterm_position = "bottom"

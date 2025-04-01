@@ -61,7 +61,7 @@ require("gitsigns").setup({
     ignore_whitespace = false,
     virt_text_priority = 100,
   },
-  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d %X> - <summary>",
+  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d %H:%M:%S> - <summary>",
 })
 
 require("lspconfig").gopls.setup({
