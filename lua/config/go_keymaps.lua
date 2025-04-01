@@ -1,5 +1,5 @@
 function LiveGrepWithExtension(extension)
-  require("telescope.builtin").live_grep({
+  require("fzf-lua").live_grep({
     additional_args = function(opts)
       return { "--glob", "*." .. extension }
     end,
@@ -10,28 +10,34 @@ function LiveGrepUp(n)
   local bufnr = vim.api.nvim_get_current_buf()
   local full_path = vim.api.nvim_buf_get_name(bufnr)
   local file_path = vim.fs.dirname(full_path)
-  -- 用系统的路径分隔符分割路径
+
+  -- 获取系统路径分隔符
   local path_sep = package.config:sub(1, 1)
   local components = {}
 
-  -- 分割路径到各个组件
+  -- 分割路径为组件
   for component in string.gmatch(file_path, "[^" .. path_sep .. "]+") do
     table.insert(components, component)
   end
 
-  -- 计算向上n级的路径
+  -- 计算向上 n 级的路径
   local up_n = #components - n
   if up_n < 1 then
     up_n = 1
   end -- 确保不会超出根目录
+
   local new_cwd = path_sep
   for i = 1, up_n do
     new_cwd = new_cwd .. components[i] .. (i < up_n and path_sep or "")
   end
 
-  print("search under:" .. new_cwd)
-  -- 使用新的目录执行Telescope live_grep
-  require("telescope.builtin").live_grep({ cwd = new_cwd })
+  print("search under: " .. new_cwd)
+
+  -- 使用 fzf-lua 执行 live_grep
+  require("fzf-lua").live_grep({
+    cwd = new_cwd,
+    rg_opts = "--column --line-number --no-heading --color=always --smart-case --no-ignore --hidden",
+  })
 end
 
 vim.api.nvim_create_user_command(
@@ -50,7 +56,7 @@ function TodoWithCWD()
     pwd = goplsRootDir
   end
   print("TodoFzfLua at : " .. pwd)
-  vim.cmd("TodoFzfLua cwd=" .. pwd)
+  vim.cmd(string.format("TodoFzfLua cwd=%s", pwd))
 end
 
 -- 待定列表
@@ -95,7 +101,7 @@ function TodoWithProject()
     pwd = projectDir
   end
   print("TodoFzfLua at : " .. pwd)
-  vim.cmd("TodoFzfLua cwd=" .. pwd)
+  vim.cmd(string.format("TodoFzfLua cwd=%s", pwd))
 end
 
 vim.api.nvim_set_keymap("n", "\\fp", ":lua TodoWithProject()<CR>", { noremap = true })

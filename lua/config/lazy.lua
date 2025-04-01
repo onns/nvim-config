@@ -30,7 +30,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "onedark", "tokyonight", "habamax" } },
+  install = { colorscheme = {} },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
@@ -61,7 +61,7 @@ require("gitsigns").setup({
     ignore_whitespace = false,
     virt_text_priority = 100,
   },
-  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d %X> - <summary>",
+  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d %H:%M:%S> - <summary>",
 })
 
 require("lspconfig").gopls.setup({
@@ -109,3 +109,5 @@ require("fzf-lua").setup({
   },
   fzf_opts = { ["--wrap"] = true },
 })
+
+-- vim.cmd("colorscheme onedark_dark")

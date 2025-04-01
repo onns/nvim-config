@@ -393,18 +393,46 @@ vim.api.nvim_set_keymap(
 )
 vim.api.nvim_set_keymap("n", "\\pr", ":lua ExportExpandToClipboard()<CR>", { noremap = true })
 
-vim.api.nvim_set_keymap(
-  "n",
-  "\\pj",
-  [[:.s/\v(\w+) \= (\d+).*;/\1 = \2 [(gogoproto.jsontag) = '\1', json_name = '\1'];<CR>]],
-  { noremap = true, silent = true }
-)
-vim.api.nvim_set_keymap(
-  "n",
-  "\\pf",
-  [[:.s/\v(\w+) \= (\d+).*;/\1 = \2 [(gogoproto.moretags) = 'form:"\1"',(gogoproto.jsontag) = '\1', json_name = '\1'];<CR>]],
-  { noremap = true, silent = true }
-)
+vim.keymap.set("v", "\\pj", function()
+  -- 获取选区范围
+  local start_line = vim.fn.line("v")
+  local end_line = vim.fn.line(".")
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
+
+  -- 对每一行进行替换
+  for lnum = start_line, end_line do
+    local line = vim.fn.getline(lnum)
+    local replaced =
+      string.gsub(line, [[([%w_]+) = (%d+).*;]], [[%1 = %2 [(gogoproto.jsontag) = '%1', json_name = '%1'];]])
+    if replaced ~= line then
+      vim.fn.setline(lnum, replaced)
+    end
+  end
+end, { noremap = true, silent = true })
+
+vim.keymap.set("v", "\\pf", function()
+  -- 获取选区范围
+  local start_line = vim.fn.line("v")
+  local end_line = vim.fn.line(".")
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
+
+  -- 对每一行进行替换
+  for lnum = start_line, end_line do
+    local line = vim.fn.getline(lnum)
+    local replaced = string.gsub(
+      line,
+      [[([%w_]+) = (%d+).*;]],
+      [[%1 = %2 [(gogoproto.moretags) = 'form:"%1"', (gogoproto.jsontag) = '%1', json_name = '%1'];]]
+    )
+    if replaced ~= line then
+      vim.fn.setline(lnum, replaced)
+    end
+  end
+end, { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap("n", "\\pi", ":lua GetGoImportPath()<CR>", { noremap = true })
 
@@ -418,3 +446,6 @@ vim.api.nvim_set_keymap(
 vim.api.nvim_set_keymap("n", "\\ig", ":lua InsertGitBranch()<CR>", { noremap = true })
 
 vim.api.nvim_set_keymap("n", "[on", "<cmd>lua JumpToFunctionName()<CR>", { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap("n", "\\aq", ":FloatermNew<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "\\aa", ":FloatermToggle!<CR>", { noremap = true, silent = true })
