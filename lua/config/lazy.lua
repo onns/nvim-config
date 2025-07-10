@@ -30,7 +30,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  install = { colorscheme = {} },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
@@ -51,3 +51,63 @@ require("lazy").setup({
     },
   },
 })
+
+require("gitsigns").setup({
+  current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+  current_line_blame_opts = {
+    virt_text = true,
+    virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
+    delay = 100,
+    ignore_whitespace = false,
+    virt_text_priority = 100,
+  },
+  current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d %H:%M:%S> - <summary>",
+})
+
+require("lspconfig").gopls.setup({
+  cmd = { "gopls", "-remote=unix;/tmp/gopls-daemon-socket" },
+  settings = {
+    gopls = {
+      gofumpt = true,
+    },
+  },
+})
+
+-- require("lspconfig").bufls.setup({})
+
+-- https://github.com/hrsh7th/nvim-cmp/issues/1809
+-- gopls 在返回提示词的时候随机选择，理论上应该默认选第一个
+-- local cmp = require("cmp")
+-- cmp.setup({
+--   preselect = cmp.PreselectMode.None,
+-- })
+
+require("aerial").setup({
+  layout = {
+    min_width = 40,
+    max_width = { 60, 0.3 },
+  },
+})
+
+-- https://github.com/nvim-telescope/telescope.nvim/pull/1735
+-- require("telescope").setup({
+--   defaults = {
+--     wrap_results = true,
+--     sorting_strategy = "ascending",
+--   },
+-- })
+--
+-- require("lspconfig").buf_ls.setup({
+--   root_dir = require("lspconfig.util").root_pattern(".git", "buf.yaml"),
+-- })
+
+require("fzf-lua").setup({
+  winopts = {
+    preview = {
+      wrap = "wrap",
+    },
+  },
+  fzf_opts = { ["--wrap"] = true },
+})
+
+-- vim.cmd("colorscheme onedark_dark")
