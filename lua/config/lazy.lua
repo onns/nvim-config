@@ -110,4 +110,6 @@ require("fzf-lua").setup({
   fzf_opts = { ["--wrap"] = true },
 })
 
--- vim.cmd("colorscheme onedark_dark")
+require("lspconfig").protols.setup({})
+
+vim.cmd("colorscheme onelight")

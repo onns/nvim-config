@@ -38,25 +38,29 @@ function GetLSPRootDir()
 end
 
 function GoToPathAndLine(input)
-  if input == "" then
+  if not input or input == "" then
     return
   end
-  local parts = vim.split(input, ":")
-  local file = parts[1]
-  local line = 1
-  if #parts > 1 then
-    line = parts[2]
-  end
-  -- 如果有工作路径，选第一个，否则选当前路径
+
+  -- 只切第一个 :
+  local file, line = input:match("^([^:]+):?(%d*)$")
+
+  -- 工作目录优先级
   local pwd = vim.fn.getcwd()
-  -- if vim.g.WorkspaceFolders and #vim.g.WorkspaceFolders > 0 then
-  --     pwd = vim.g.WorkspaceFolders[1]
-  -- end
   local goplsRootDir = GetLSPRootDir()
   if goplsRootDir then
     pwd = goplsRootDir
   end
-  vim.cmd("edit +" .. line .. " " .. pwd .. "/" .. file)
+
+  local path = vim.fs.joinpath(pwd, file)
+
+  if line ~= "" then
+    -- 显式指定行号才跳转
+    vim.cmd(("edit +%d %s"):format(tonumber(line), vim.fn.fnameescape(path)))
+  else
+    -- 不指定行号 → 使用 Neovim 的上次光标位置
+    vim.cmd(("edit %s"):format(vim.fn.fnameescape(path)))
+  end
 end
 
 function ExportExpandToClipboard()
@@ -113,30 +117,27 @@ function InsertGitBranch()
   end
 end
 
-local ts_utils = require("nvim-treesitter.ts_utils")
-
 function JumpToFunctionName()
-  -- vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('[f', true, true, true), 'm', true)
-  local node = ts_utils.get_node_at_cursor()
+  -- 获取光标处的 node
+  local node = vim.treesitter.get_node()
+  if not node then
+    return
+  end
 
+  -- 向上遍历父节点
   while node do
-    -- print(node:type())
-    if node:type() == "function_declaration" or node:type() == "method_declaration" then
-      local child_count = node:child_count()
-      for i = 0, child_count - 1 do
-        local child = node:child(i)
-        -- print("Child " .. i .. ": " .. child:type())
-        if child then
-          if node:type() == "function_declaration" and child:type() == "identifier" then
-            local start_row, start_col, _, _ = child:range()
-            vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-            return
-          end
-          if node:type() == "method_declaration" and child:type() == "field_identifier" then
-            local start_row, start_col, _, _ = child:range()
-            vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-            return
-          end
+    local t = node:type()
+    if t == "function_declaration" or t == "method_declaration" then
+      -- 遍历当前函数声明的所有子节点
+      for child in node:iter_children() do
+        local ct = child:type()
+        if
+          (t == "function_declaration" and ct == "identifier")
+          or (t == "method_declaration" and ct == "field_identifier")
+        then
+          local start_row, start_col = child:range()
+          vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
+          return
         end
       end
     end
@@ -173,214 +174,99 @@ function GetGoImportPath()
   print("Import path copied to clipboard: " .. import_package_name)
 end
 
-local function get_child_index(node)
-  local parent = node:parent()
-  if not parent then
-    return nil, 0
-  end -- 如果没有父节点，则返回nil
-
-  local child_count = parent:child_count()
-  local index = 0
-  -- 遍历父节点的所有子节点
-  for child in parent:iter_children() do
-    if child:id() == node:id() then
-      return index, child_count -- 当找到匹配的子节点时，返回当前索引
-    end
-    index = index + 1
-  end
-
-  return nil, child_count -- 如果没有找到匹配的子节点，返回nil
-end
-
--- TODO: onns main 待实现
-function JumpToCall(direction)
-  local node = ts_utils.get_node_at_cursor()
-  local function search_upwards(current_node)
-    if not current_node then
-      return nil
-    end
-    print("Child " .. i .. ": " .. child:type())
-    if current_node:type() == "call_expression" then
-      return current_node
-    else
-      local node_index, _ = get_child_index(node)
-      if node_index == 0 then
-        return search_upwards(current_node:parent())
-      else
-        return search_upwards(current_node:parent():child(node_index - 1))
-      end
-    end
-  end
-
-  local function search_downwards(current_node, count)
-    if count == 200 then
-      return nil
-    end
-    if not current_node then
-      return nil
-    end
-    if current_node:type() == "call_expression" then
-      return current_node
-    end
-    for child in current_node:iter_children() do
-      local found = search_downwards(child, count + 1)
-      if found then
-        return found
-      end
-    end
-
-    while current_node do
-      local parent = current_node:parent()
-      local node_index, node_count = get_child_index(current_node)
-      if node_count == 0 then
-        return nil
-      end
-      if node_index < node_count - 1 then
-        local child = parent:child(node_index + 1)
-        local found = search_downwards(child, count + 1)
-        if found then
-          return found
-        end
-      end
-      current_node = parent:parent()
-    end
-    return nil
-  end
-
-  local res_node = nil
-  if direction == "up" then
-    res_node = search_upwards(node:parent())
-  elseif direction == "down" then
-    res_node = search_downwards(node, 0)
-  else
-    error("Direction must be 'up' or 'down'.")
-  end
-  if res_node then
-    print("Child count: ->" .. res_node:type())
-    local start_row, start_col, _, _ = res_node:range()
-    vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-  end
-end
-
 local function _set_cursor(node)
-  -- TODO: check the validity of range
-  local start_row, start_col, _, _ = node:range()
+  if not node then
+    return
+  end
+  local start_row, start_col = node:range()
   vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
 end
 
+local function find_function_call_node(start_node, reverse)
+  local stack = { start_node }
+  local result = nil
+
+  while #stack > 0 do
+    local node = table.remove(stack)
+    if node:type() == "call_expression" then
+      result = node
+      if not reverse then
+        return result
+      end
+    end
+
+    -- 将子节点反向压栈，保证遍历顺序一致
+    local children = {}
+    for child in node:iter_children() do
+      table.insert(children, 1, child)
+    end
+    for _, child in ipairs(children) do
+      table.insert(stack, child)
+    end
+  end
+
+  return result
+end
+
+-- 获取当前光标所在节点
+local function get_node_at_cursor()
+  return vim.treesitter.get_node()
+end
+
+-- 跳到下一个函数调用
 function JumpToNextFuncCall()
-  local node = ts_utils.get_node_at_cursor()
-  local ctr = 0 -- ugly prevention of endless loop
+  local node = get_node_at_cursor()
+  if not node then
+    return
+  end
 
-  while node do
-    ctr = ctr + 1
-
+  for _ = 1, 1000 do
     local sibling = node:next_sibling()
-    print(sibling)
-    -- if the current node does not have a leftmore sibling then we traverse its parent node
     if not sibling then
       node = node:parent()
-      goto continue
-    end
-
-    node = sibling
-
-    -- TODO: which kinds of nodes contain function_call? (for performance enhancement)
-    -- currently, for all previous nodes we do a DFS traverse to find the first "function_call"
-    local first_function_call_node = nil
-    local stack = { node }
-
-    while #stack > 0 do
-      local current_node = table.remove(stack)
-
-      if current_node:type() == "call_expression" then
-        first_function_call_node = current_node
-        break
-      end
-
-      local children = {}
-      for child in current_node:iter_children() do
-        table.insert(children, 1, child)
-      end
-
-      for _, child in ipairs(children) do
-        table.insert(stack, child)
+    else
+      node = sibling
+      local call = find_function_call_node(node, false)
+      if call then
+        _set_cursor(call)
+        return
       end
     end
-
-    if first_function_call_node then
-      _set_cursor(first_function_call_node)
-      return
-    end
-
-    if ctr > 1000 then
-      print("endless loop...")
+    if not node then
       break
     end
-
-    ::continue::
   end
 end
 
+-- 跳到上一个函数调用
 function JumpToLastFuncCall()
-  local node = ts_utils.get_node_at_cursor()
-  local ctr = 0 -- ugly prevention of endless loop
+  local node = get_node_at_cursor()
+  if not node then
+    return
+  end
 
-  while node do
-    ctr = ctr + 1
-
+  for _ = 1, 1000 do
     local sibling = node:prev_sibling()
-    print(sibling)
-    -- if the current node does not have a leftmore sibling then we traverse its parent node
     if not sibling then
       node = node:parent()
-      goto continue
-    end
-
-    node = sibling
-
-    -- TODO: which kinds of nodes contain function_call? (for performance enhancement)
-    -- currently, for all previous nodes we do a DFS traverse to find the last "function_call"
-    local last_function_call_node = nil
-    local stack = { node }
-
-    while #stack > 0 do
-      local current_node = table.remove(stack)
-
-      if current_node:type() == "call_expression" then
-        last_function_call_node = current_node
-      end
-
-      local children = {}
-      for child in current_node:iter_children() do
-        table.insert(children, 1, child)
-      end
-
-      for _, child in ipairs(children) do
-        table.insert(stack, child)
+    else
+      node = sibling
+      local call = find_function_call_node(node, true)
+      if call then
+        _set_cursor(call)
+        return
       end
     end
-
-    if last_function_call_node then
-      _set_cursor(last_function_call_node)
-      return
-    end
-
-    if ctr > 1000 then
-      print("endless loop...")
+    if not node then
       break
     end
-
-    ::continue::
   end
 end
 
 vim.api.nvim_set_keymap("n", "]oc", "<cmd>lua JumpToNextFuncCall()<CR>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "[oc", "<cmd>lua JumpToLastFuncCall()<CR>", { noremap = true, silent = true })
 
--- vim.api.nvim_set_keymap("n", "<leader>fe", "<cmd>Rest run<cr>", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "\\fz", ":Neotree reveal reveal_force_cwd<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "]od", '<cmd>lua JumpToCall("down")<CR>', { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap("n", "\\rp", "<Plug>RestNvimPreview", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "\\rr", "<Plug>RestNvim", { noremap = true, silent = true })

@@ -20,10 +20,10 @@ return {
       require("onedark").load()
     end,
   },
-  -- {
-  --   "olimorris/onedarkpro.nvim",
-  --   priority = 1000, -- Ensure it loads first
-  -- },
+  {
+    "olimorris/onedarkpro.nvim",
+    priority = 1000, -- Ensure it loads first
+  },
   {
     "git@github.com:fatih/vim-go.git",
   },
