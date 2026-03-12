@@ -99,6 +99,9 @@ require("fzf-lua").setup({
     },
   },
   fzf_opts = { ["--wrap"] = true },
+  grep = {
+    rg_opts = "--column --line-number --no-heading --color=always --smart-case --sortr=modified",
+  },
 })
 
 require("lspconfig").protols.setup({})
