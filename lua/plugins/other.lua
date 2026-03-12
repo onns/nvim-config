@@ -1,4 +1,6 @@
-local gopls_socket = "/tmp/gopls-daemon-socket"
+local user = vim.env.USER or "unknown"
+local uid = (vim.uv and vim.uv.os_getuid and vim.uv.os_getuid()) or "nouid"
+local gopls_socket = string.format("/tmp/gopls-daemon-socket-%s-%s", user, uid)
 local gopls_remote_addr = "unix;" .. gopls_socket
 local gopls_cmd = table.concat({
   "if ! gopls -remote='" .. gopls_remote_addr .. "' remote sessions >/dev/null 2>&1; then",
