@@ -77,7 +77,10 @@ return {
           cmd = { "sh", "-c", gopls_cmd },
           settings = {
             gopls = {
-              gofumpt = true,
+              -- gopls 自带的 mvdan.cc/gofumpt 是上游版本，只豁免模块自身路径，
+              -- 会把 go-common/... 之类无点依赖当成标准库提到第一组。
+              -- 交给 conform 调 PATH 上打过补丁的 gofumpt，见 plugins/format.lua。
+              gofumpt = false,
             },
           },
         },
