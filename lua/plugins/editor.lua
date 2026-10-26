@@ -45,4 +45,13 @@ return {
       -- log_level = 'debug',
     },
   },
+  {
+    "onns/nvim-idle-exit",
+    lazy = false,
+    config = function()
+      require("idle-exit").setup({
+        timeout = 15 * 60,
+      })
+    end,
+  },
 }
