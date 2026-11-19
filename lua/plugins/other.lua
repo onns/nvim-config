@@ -64,9 +64,6 @@ return {
     lazy = false,
   },
   {
-    "git@github.com:wakatime/vim-wakatime.git",
-  },
-  {
     "buoto/gotests-vim",
   },
   {
